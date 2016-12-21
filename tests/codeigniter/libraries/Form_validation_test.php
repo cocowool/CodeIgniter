@@ -13,10 +13,8 @@ class Form_validation_test extends CI_TestCase {
 		// Same applies for lang
 		$lang = $this->getMockBuilder('CI_Lang')->setMethods(array('load'))->getMock();
 
-		$this->ci_set_config('charset', 'UTF-8');
-		$utf8 = new Mock_Core_Utf8();
-		$security = new Mock_Core_Security();
-		$input = new Mock_Core_Input($security, $utf8);
+		$security = new Mock_Core_Security('UTF-8');
+		$input = new CI_Input($security);
 
 		$this->ci_instance_var('lang', $lang);
 		$this->ci_instance_var('load', $loader);
@@ -577,20 +575,6 @@ class Form_validation_test extends CI_TestCase {
 		$regex = '/f[a-zA-Z]+/';
 		$this->assertTrue($this->form_validation->regex_match('foo', $regex));
 		$this->assertFalse($this->form_validation->regex_match('bar', $regex));
-	}
-
-	public function test_prep_for_form()
-	{
-		$this->form_validation->reset_validation();
-		$error_msg_unprepped = '<error =\'foobar\'">';
-		$error_msg_prepped = '&lt;error =&#39;foobar&#39;&quot;&gt;';
-		$this->form_validation->set_rules('foo', 'label', 'required', array('required' => $error_msg_unprepped));
-		$_POST = array('foo' => '');
-		$this->form_validation->run();
-		$error_arr = $this->form_validation->error_array();
-
-		$this->assertEquals('', $this->form_validation->prep_for_form(''));
-		$this->assertEquals(array('foo' => $error_msg_prepped), $this->form_validation->prep_for_form($error_arr));
 	}
 
 	public function test_prep_url()
